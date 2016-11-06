@@ -7,14 +7,20 @@
 # 
 # This example is in the public domain
 
-print "Hello"
-
+import SimpleHTTPServer
+import SocketServer
+import thread
 from bbio import *
 
 def setup():
   # Start Serial2 at 9600 baud:
   Serial2.begin(9600)
+  PORT = 8000
+  Handler = SimpleHTTPServer.SimpleHTTPRequestHandler
 
+  httpd = SocketServer.TCPServer(("", PORT), Handler)
+  print "serving at port", PORT
+  thread.start_new_thread(httpd.serve_forever, ())
 
 def loop():
   if (Serial2.available()):
