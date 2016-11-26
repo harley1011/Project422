@@ -1,9 +1,7 @@
 # Serial2 TX = pin 21 on P9 header
 # Serial2 RX = pin 22 on P9 header
 
-import SimpleHTTPServer
 import SocketServer
-import thread
 import sys
 
 from bbio import *
@@ -12,14 +10,8 @@ online_node_ids = []
 data_buffer = ''
 
 def setup():
+    print "Setting up serial communications..."
     Serial2.begin(9600)
-    PORT = 8000
-    Handler = SimpleHTTPServer.SimpleHTTPRequestHandler
-
-    global httpd = SocketServer.TCPServer(("", PORT), Handler)
-    print "serving at port", PORT
-    thread.start_new_thread(httpd.serve_forever, ())
-    thread.start_new_thread(command_scan, ())
 
 def loop():
     if (Serial2.available()):
@@ -35,13 +27,6 @@ def loop():
         parse_message()
 
     delay(200)
-
-def command_scan():
-    while True:
-        value = raw_input()
-        if value == 'quit':
-            print "Terminating program..."
-            sys.exit()
 
 def parse_message():
     # Handle new node register
@@ -62,5 +47,6 @@ def handle_node_message(message):
     id = message[0]
     info = message[1]
 
-run(setup, loop)
+def start():
+    run(setup, loop)
 
