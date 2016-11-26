@@ -1,7 +1,7 @@
 #include <avr/io.h>
 #define F_CPU 1000000UL
-#define USART_BAUDRATE 4800
-#define BAUD_PRESCALE (((F_CPU/(USART_BAUDRATE*16UL)))-1)
+#define BAUDRATE 4800
+#define BAUD_PRESCALLER (((F_CPU / (BAUDRATE * 16UL))) - 1)
 #include <string.h>
 #include <time.h>
 #include <stdlib.h>
@@ -11,6 +11,7 @@ unsigned char usart_receive(void);
 void usart_send( unsigned char data);
 void usart_putstring(char* StringPtr);
 int write_to_master(char write);
+void generateID(char* data);
 
 int main(void){
  char recieved_byte;
@@ -87,6 +88,11 @@ while(1){
   if(idReceive[1]==idRequest[1]&&idReceive[2]==idRequest[2]
     &&idReceive[3]==idRequest[3]&&idReceive[4]==idRequest[4]){
     data[0]=idReceive[0];
+  //test received string
+  usart_putstring(idReceive);
+  usart_putstring(data);
+
+  //test end
     break;
   }
 }
