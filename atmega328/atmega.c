@@ -70,31 +70,35 @@ void usart_putstring(char* StringPtr){
 
 void usart_receiveString(char* data){
     int i;
-    for(i=0;i<5;i++){
+    for(i=0;i<6;i++){
       data[i]=usart_receive();
     }
 }
 
 void generateID(char* data){
-  char idRequest[5];
-  char idReceive[5];
+  char idRequest[6];
+  char idReceive[6];
 
 idRequest[0]='0';
+idRequest[1]='0';
+//idRequest[1]='a';
+//idRequest[2]='b';
+//idRequest[3]='c';
+//idRequest[4]='d';
 srand(time(NULL));
 uint32_t temp = rand();
-idRequest[4]=(temp>>24) & 0xFF;
-idRequest[3]=(temp>>16) & 0xFF;
-idRequest[2]=(temp>>8) & 0xFF;
-idRequest[1]=temp & 0xFF;
+idRequest[5]=(temp>>24) & 0xFF;
+idRequest[4]=(temp>>16) & 0xFF;
+idRequest[3]=(temp>>8) & 0xFF;
+idRequest[2]=temp & 0xFF;
 
 usart_receive();
-usart_send('b');
 usart_putstring(idRequest);
 
 while(1){
   usart_receiveString(idReceive);
-  if(idReceive[1]==idRequest[1]&&idReceive[2]==idRequest[2]
-    &&idReceive[3]==idRequest[3]&&idReceive[4]==idRequest[4]){
+  if(idReceive[2]==idRequest[2]&&idReceive[3]==idRequest[3]
+    &&idReceive[4]==idRequest[4]&&idReceive[5]==idRequest[5]){
     data[0]=idReceive[0];
   //test received string
   usart_putstring(idReceive);
