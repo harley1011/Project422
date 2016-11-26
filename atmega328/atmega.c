@@ -25,22 +25,8 @@ generateID(data);
 
 
   
-    for(;;){
-      int count =0;
-  // wait until a byte is ready to read
-  while( ( UCSR0A & ( 1 << RXC0 ) ) == 0 ){}
- 
-  // grab the byte from the serial port
-  recieved_byte = UDR0;
-
-  while(count < strlen(data){
-  // wait until the port is ready to be written to
-    while( ( UCSR0A & ( 1 << UDRE0 ) ) == 0 ){}
- 
-  // write the byte to the serial port
-    UDR0 = data[count];
-    } 
-  }
+  while(1){}
+  
     return 0;   /* never reached */
 }
 
