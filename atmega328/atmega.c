@@ -1,7 +1,7 @@
 #include <avr/io.h>
 #define F_CPU 1000000UL
-#define BAUDRATE 4800
-#define BAUD_PRESCALLER (((F_CPU / (BAUDRATE * 16UL))) - 1)
+#define USART_BAUDRATE 4800
+#define BAUD_PRESCALE (((F_CPU/(USART_BAUDRATE*16UL)))-1)
 #include <string.h>
 #include <time.h>
 #include <stdlib.h>
@@ -12,13 +12,19 @@ void usart_send( unsigned char data);
 void usart_putstring(char* StringPtr);
 int write_to_master(char write);
 void generateID(char* data);
+void usart_receiveString(char* data);
 
 int main(void){
  char recieved_byte;
  char data[6];
   
 usart_init();
-
+/*test usart
+while(1){
+  usart_receive();
+  usart_putstring("abcde");
+}
+end test*/
 generateID(data);
 
 
@@ -39,20 +45,20 @@ int write_to_master(char write)
 }
 void usart_init(void){
     // usart initialization code
-    UBRR0H = (uint8_t)(BAUD_PRESCALLER>>8);
-      UBRR0L = (uint8_t)(BAUD_PRESCALLER);
-        UCSR0B = (1<<RXEN0)|(1<<TXEN0);
-          UCSR0C = (3<<UCSZ00);
+  UCSR0B |= (1<<RXEN0)  | (1<<TXEN0);
+  UCSR0C |= (1<<UCSZ00) | (1<<UCSZ01);
+  UBRR0H  = (BAUD_PRESCALE >> 8);
+  UBRR0L  = BAUD_PRESCALE;
 }
 
 unsigned char usart_receive(void){
-    while(!(UCSR0A & (1<<RXC0)));
+    while( ( UCSR0A & ( 1 << RXC0 ) ) == 0 ){}
       return UDR0;
 }
 
 void usart_send( unsigned char data){
     //wait for register to be ready
-    while(!(UCSR0A & (1<<UDRE0)));
+    while( ( UCSR0A & ( 1 << UDRE0 ) ) == 0 ){}
       UDR0 = data;
 }
 
@@ -64,7 +70,7 @@ void usart_putstring(char* StringPtr){
 
 void usart_receiveString(char* data){
     int i;
-    for(i=0;i<6;i++){
+    for(i=0;i<5;i++){
       data[i]=usart_receive();
     }
 }
@@ -73,14 +79,16 @@ void generateID(char* data){
   char idRequest[5];
   char idReceive[5];
 
-idRequest[0]=0;
+idRequest[0]='0';
 srand(time(NULL));
-int temp = rand();
+uint32_t temp = rand();
 idRequest[4]=(temp>>24) & 0xFF;
 idRequest[3]=(temp>>16) & 0xFF;
 idRequest[2]=(temp>>8) & 0xFF;
 idRequest[1]=temp & 0xFF;
 
+usart_receive();
+usart_send('b');
 usart_putstring(idRequest);
 
 while(1){
