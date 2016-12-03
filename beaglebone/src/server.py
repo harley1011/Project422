@@ -1,14 +1,14 @@
 from flask import Flask, Blueprint, render_template, abort, send_from_directory
 from jinja2 import TemplateNotFound
 
-# import socketio
-# import eventlet
-# import eventlet.wsgi
+import socketio
+import eventlet
+import eventlet.wsgi
 from comms import serial_reader
 import thread
 import os
 
-#sio = socketio.Server()
+sio = socketio.Server()
 
 comms = serial_reader.SerialReader()
 thread.start_new_thread(comms.start, ())
@@ -36,10 +36,17 @@ def serve_css(path):
         print Exception.message
         abort(404)
 
+@simple_page.route('/nodes')
+def show_nodes():
+    try:
+        return render_template('nodes', nodes=comms.nodes)
+    except TemplateNotFound:
+        abort(404)
 
 @simple_page.route('/<page>')
 def show(page):
     try:
+        comms.nodes.append(serial_reader.Node(comms.nodes[len(comms.nodes) - 1].id + 1,'Test', 'Online'))
         return render_template('pages/%s' % page, nodes=comms.nodes)
     except TemplateNotFound:
         abort(404)

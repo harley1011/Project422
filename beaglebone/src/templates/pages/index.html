@@ -33,11 +33,7 @@
 <body>
 
 <div class="wrapper">
-    <div class="sidebar" data-color="purple" data-image="assets/img/sidebar-5.jpg">
-
-    <!--   you can change the color of the sidebar using: data-color="blue | azure | green | orange | red | purple" -->
-
-
+    <div class="sidebar" data-color="blue" data-image="assets/img/sidebar-5.jpg">
     </div>
 
     <div class="main-panel">
@@ -54,9 +50,7 @@
                 </div>
             </div>
         </nav>
-
-
-        <div class="content">
+        <div id="node-container" class="content">
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-md-12">
@@ -74,14 +68,14 @@
                                         <th>Status</th>
                                     </thead>
                                     <tbody>
-                                        {% for node in nodes %}
+                                    {% for node in nodes %}
                                         <tr>
                                         	<td>{{node.id}}</td>
                                         	<td>{{node.name}}</td>
                                         	<td>{{node.type}}</td>
                                             <td>{{node.status}}</td>
                                         </tr>
-                                        {% endfor %}
+                                    {% endfor %}
                                     </tbody>
                                 </table>
                             </div>
@@ -99,7 +93,7 @@
     <!--   Core JS Files   -->
     <script src="assets/js/jquery-1.10.2.js" type="text/javascript"></script>
 	<script src="assets/js/bootstrap.min.js" type="text/javascript"></script>
-
+	<script src="assets/js/app.js" type="text/javascript"></script>
 	<!--  Checkbox, Radio & Switch Plugins -->
 	<script src="assets/js/bootstrap-checkbox-radio-switch.js"></script>
 
