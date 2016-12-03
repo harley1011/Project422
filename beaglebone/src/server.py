@@ -31,7 +31,8 @@ def serve_css(path):
     print(path)
     try:
         return send_from_directory('templates\\pages\\assets\\', path)
-    except:
+    except Exception:
+        print Exception.message
         abort(404)
 
 
