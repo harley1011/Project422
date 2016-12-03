@@ -1,7 +1,10 @@
 # Serial2 TX = pin 21 on P9 header
 # Serial2 RX = pin 22 on P9 header
 import time
-from bbio import *
+
+beaglebone = True
+if beaglebone:
+    from bbio import *
 
 
 class SerialReader:
@@ -16,7 +19,8 @@ class SerialReader:
 
     def setup(self):
         print "Setting up serial communications..."
-        Serial2.begin(9600)
+        if beaglebone:
+            Serial2.begin(9600)
 
     def loop(self):
         data = ''
@@ -56,7 +60,8 @@ class SerialReader:
         info = message[1]
 
     def start(self):
-        run(self.setup, self.loop)
+        if self.beaglebone:
+            run(self.setup, self.loop)
 
 
 class Node:
