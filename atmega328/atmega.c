@@ -43,7 +43,9 @@ sei();
 ISR(TIMER1_COMPA_vect) { // enable timer compare interrupt
 PORTD ^= (1 << PD6); // set pin 6 of Port D as XOR to blink, debug
 uint32_t door;
-door = (uint32_t)ADCsingleREAD(1);
+uint32_t light;
+door = (uint32_t)ADCsingleREAD(1); //set ADC1
+light = (uint32_t)ADCsingleREAD(2);
 
 if(door>0){
   data[1]=0x01;
@@ -51,8 +53,15 @@ if(door>0){
   data[4]=(door>>16) & 0xFF;
   data[3]=(door>>8) & 0xFF;
   data[2]=door & 0xFF;
-  usart_putstring(data);
+}else if(light>0){
+  data[1]=0x02;
+  data[5]=(light>>24) & 0xFF;
+  data[4]=(light>>16) & 0xFF;
+  data[3]=(light>>8) & 0xFF;
+  data[2]=light & 0xFF;
 }
+
+usart_putstring(data);
 }
 
 int write_to_master(char write) 
