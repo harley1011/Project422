@@ -76,10 +76,10 @@
                                     <tbody>
                                         {% for node in nodes %}
                                         <tr>
-                                        	<td>{{node}}</td>
-                                        	<td>Beta</td>
-                                        	<td>Heat</td>
-                                            <td>Online</td>
+                                        	<td>{{node.id}}</td>
+                                        	<td>{{node.name}}</td>
+                                        	<td>{{node.type}</td>
+                                            <td>{{node.status}}</td>
                                         </tr>
                                         {% endfor %}
                                     </tbody>

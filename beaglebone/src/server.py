@@ -4,13 +4,13 @@ from jinja2 import TemplateNotFound
 # import socketio
 # import eventlet
 # import eventlet.wsgi
-#from comms import serial_reader
+from comms import serial_reader
 import thread
 
 #sio = socketio.Server()
 
-#comms = serial_reader.SerialReader()
-#thread.start_new_thread(comms.start, ())
+comms = serial_reader.SerialReader()
+thread.start_new_thread(comms.start, ())
 
 app = Flask(__name__)
 
@@ -38,7 +38,7 @@ def serve_css(path):
 @simple_page.route('/<page>')
 def show(page):
     try:
-        return render_template('pages/%s' % page, nodes=['1', '2', '3', '4', '5'])
+        return render_template('pages/%s' % page, nodes=comms.nodes)
     except TemplateNotFound:
         abort(404)
 

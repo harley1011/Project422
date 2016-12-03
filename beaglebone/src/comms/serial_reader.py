@@ -11,6 +11,8 @@ class SerialReader:
         self.data_buffer = ''
         self.status = 'Offline'
 
+        self.nodes.append(Node(1, 'Beta', 'Online'))
+        self.nodes.append(Node(2, 'Alpha', 'Online'))
 
     def setup(self):
         print "Setting up serial communications..."
@@ -41,9 +43,12 @@ class SerialReader:
             self.data_buffer = self.data_buffer[12:]
 
     def handle_new_node(self, message):
-        current_id = self.nodes[len(online_node_ids) - 1].id
+        if len(self.nodes) == 0:
+            current_id = 1
+        else:
+            current_id = self.nodes[len(self.nodes) - 1].id
         message[0] = chr(current_id + 1)
-        self.nodes.append(Node(current_id + 1))
+        self.nodes.append(Node(current_id + 1, 'Node ' + message[0], 'Registering'))
         Serial2.write(message)
 
     def handle_node_message(self, message):
@@ -59,5 +64,6 @@ class Node:
         self.id = id
         self.name = name
         self.status = status
+        self.type = 'NA'
         self.last_receive = time.time()
 
