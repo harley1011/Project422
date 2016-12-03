@@ -56,7 +56,7 @@ class SerialReader:
         info = message[1]
 
     def start(self):
-        run(setup, loop)
+        run(self.setup, self.loop)
 
 
 class Node:
