@@ -5,6 +5,7 @@
 #include <string.h>
 #include <time.h>
 #include <stdlib.h>
+#include <avr/interrupt.h>
 
 void usart_init(void);
 unsigned char usart_receive(void);
@@ -13,10 +14,12 @@ void usart_putstring(char* StringPtr);
 int write_to_master(char write);
 void generateID(char* data);
 void usart_receiveString(char* data);
+int ADCsingleREAD(uint8_t adctouse);
 
+char data[6];
 int main(void){
  char recieved_byte;
- char data[6];
+ //char data[6];
   
 usart_init();
 /*test usart
@@ -25,16 +28,31 @@ while(1){
   usart_putstring("abcde");
 }
 end test*/
+
 generateID(data);
-
-
-
-
+timer1_init();
+DDRD |= (1<<PD6);   //set pin 6 of Port D to output, debug
+sei();
 
   
   while(1){}
   
     return 0;   /* never reached */
+}
+
+ISR(TIMER1_COMPA_vect) { // enable timer compare interrupt
+PORTD ^= (1 << PD6); // set pin 6 of Port D as XOR to blink, debug
+uint32_t door;
+door = (uint32_t)ADCsingleREAD(1);
+
+if(door>0){
+  data[1]=0x01;
+  data[5]=(door>>24) & 0xFF;
+  data[4]=(door>>16) & 0xFF;
+  data[3]=(door>>8) & 0xFF;
+  data[2]=door & 0xFF;
+  usart_putstring(data);
+}
 }
 
 int write_to_master(char write) 
@@ -43,6 +61,7 @@ int write_to_master(char write)
   while(!(SPSR & (1 << SPIF)));
   return SPDR;
 }
+
 void usart_init(void){
     // usart initialization code
   UCSR0B |= (1<<RXEN0)  | (1<<TXEN0);
@@ -75,9 +94,18 @@ void usart_receiveString(char* data){
     }
 }
 
+void timer1_init(void){
+  OCR1A = 976; //set compare register to 1 seconds count,1000000/1024
+  TCCR1B |= (1<<WGM12);  //set  The timer mode to CTC
+  TCCR1B |= (1<<CS12) | (1<<CS10);  //select the clock prescaler 1024
+  TIMSK1 |= (1 <<OCIE1A); //Set interrupt on compare match 
+}
+
 void generateID(char* data){
   char idRequest[6];
   char idReceive[6];
+
+
 
 idRequest[0]='0';
 idRequest[1]='0';
@@ -109,4 +137,25 @@ while(1){
   }
 }
 
+}
+
+int ADCsingleREAD(uint8_t adctouse){
+    int ADCval;
+
+    ADMUX = adctouse;
+    ADMUX |=(1 << REFS0);
+    ADMUX &= ~(1 << ADLAR);
+
+    ADCSRA |= (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0);
+    ADCSRA |= (1 << ADEN);
+
+    ADCSRA |= (1 << ADSC);
+
+    while(ADCSRA & (1 << ADSC));
+
+    //ADCval=ADC;
+    ADCval = ADCL;
+    ADCval = (ADCH << 8) + ADCval;
+
+    return ADCval;
 }
