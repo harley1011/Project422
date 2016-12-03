@@ -6,6 +6,7 @@ from jinja2 import TemplateNotFound
 # import eventlet.wsgi
 from comms import serial_reader
 import thread
+import os
 
 #sio = socketio.Server()
 
@@ -30,7 +31,7 @@ def show_index(page):
 def serve_css(path):
     print(path)
     try:
-        return send_from_directory('templates\\pages\\assets\\', path)
+        return send_from_directory('templates/pages/assets/', path)
     except Exception:
         print Exception.message
         abort(404)

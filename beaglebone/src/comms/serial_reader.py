@@ -2,7 +2,7 @@
 # Serial2 RX = pin 22 on P9 header
 import time
 
-beaglebone = True
+beaglebone = False
 if beaglebone:
     from bbio import *
 
