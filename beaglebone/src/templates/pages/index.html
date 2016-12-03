@@ -74,12 +74,14 @@
                                         <th>Status</th>
                                     </thead>
                                     <tbody>
+                                        {% for node in nodes %}
                                         <tr>
-                                        	<td>1</td>
+                                        	<td>{{node}}</td>
                                         	<td>Beta</td>
                                         	<td>Heat</td>
                                             <td>Online</td>
                                         </tr>
+                                        {% endfor %}
                                     </tbody>
                                 </table>
                             </div>
