@@ -3,9 +3,13 @@
 #define USART_BAUDRATE 4800
 #define BAUD_PRESCALE (((F_CPU/(USART_BAUDRATE*16UL)))-1)
 #include <string.h>
+#include <stdio.h>
 #include <time.h>
 #include <stdlib.h>
 #include <avr/interrupt.h>
+#include <util/delay.h>
+
+#include "bmp085/bmp085.h"
 
 void usart_init(void);
 unsigned char usart_receive(void);
@@ -30,6 +34,7 @@ while(1){
 end test*/
 
 generateID(data);
+bmp085_init(); //init bmp085
 timer1_init();
 DDRD |= (1<<PD6);   //set pin 6 of Port D to output, debug
 sei();
@@ -44,8 +49,12 @@ ISR(TIMER1_COMPA_vect) { // enable timer compare interrupt
 PORTD ^= (1 << PD6); // set pin 6 of Port D as XOR to blink, debug
 uint32_t door;
 uint32_t light;
+double temperature;
+uint32_t degree;
 door = (uint32_t)ADCsingleREAD(1); //set ADC1
 light = (uint32_t)ADCsingleREAD(2);
+temperature = bmp085_gettemperature();
+degree = (uint32_t)temperature;//only integer part useful
 
 if(door>0){
   data[1]=0x01;
@@ -59,6 +68,12 @@ if(door>0){
   data[4]=(light>>16) & 0xFF;
   data[3]=(light>>8) & 0xFF;
   data[2]=light & 0xFF;
+}else if(degree>0){
+  data[1]=0x03;
+  data[5]=(degree>>24) & 0xFF;
+  data[4]=(degree>>16) & 0xFF;
+  data[3]=(degree>>8) & 0xFF;
+  data[2]=degree & 0xFF;
 }
 
 usart_putstring(data);
