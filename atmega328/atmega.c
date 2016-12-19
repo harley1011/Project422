@@ -37,6 +37,7 @@ generateID(data);
 bmp085_init(); //init bmp085
 timer1_init();
 DDRD |= (1<<PD6);   //set pin 6 of Port D to output, debug
+DDRB &= ~(1 << PB2); //set PB2 input for motion sensor
 sei();
 
   
@@ -74,6 +75,12 @@ if(door>0){
   data[4]=(degree>>16) & 0xFF;
   data[3]=(degree>>8) & 0xFF;
   data[2]=degree & 0xFF;
+}else{
+  data[1]=0x04;
+  if(PINB & (1<<PB2)
+    data[2]=0x01;
+  else
+    data[2]=0x00;
 }
 
 usart_putstring(data);
