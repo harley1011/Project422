@@ -1,5 +1,8 @@
 #include <Wire.h>
 #define BMP085_ADDRESS 0x77  // I2C address of BMP085
+
+#define SENSOR_TYPE 0x01
+
 int motionSenorPin = 10;
 int lightPin = 0;
 
@@ -35,7 +38,6 @@ float altitude;
 
 void setup() {
   Serial.begin(4800);
-  //int randomNumber = random(8);
   pinMode(motionSenorPin, INPUT);
   char data[6];
   generateID(data);
@@ -47,7 +49,18 @@ void setup() {
 
 void loop() {
   //int val = readPhoto();
-  readTemp();
+  if (SENSOR_TYPE == 0x01)
+  {
+    // motion
+  }
+  else if (SENSOR_TYPE == 0x02) 
+  {
+    int val = readPhoto;
+  }
+  else if (SENSOR_TYPE == 0x03)
+  {
+      readTemp();
+  }
   //Serial.println(val);
   delay(2000);
 }
