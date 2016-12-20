@@ -74,7 +74,8 @@ class SerialReader:
 
     def handle_temp(self, node, data):
         node.data = data
-	
+
+
     def start(self):
         if self.beaglebone:
             run(self.setup, self.loop)
