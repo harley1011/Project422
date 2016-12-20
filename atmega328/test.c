@@ -9,7 +9,7 @@
 #include <avr/interrupt.h>
 #include <util/delay.h>
 
-#include "bmp085/bmp085.h"
+//#include "bmp085/bmp085.h"
 
 void usart_init(void);
 unsigned char usart_receive(void);
@@ -23,8 +23,10 @@ int ADCsingleREAD(uint8_t adctouse);
 
 char data[6];
 int main(void){
- char recieved_byte;
- //char data[6];
+  //char data[6];
+  for(int i =0; i<6; i++){
+    data[i]='0';
+  }
   
 usart_init();
 /*test usart
@@ -34,8 +36,8 @@ while(1){
 }
 end test*/
 
-generateID(data);
-bmp085_init(); //init bmp085
+//generateID(data);
+//bmp085_init(); //init bmp085
 timer1_init();
 DDRD |= (1<<PD6);   //set pin 6 of Port D to output, debug
 DDRB &= ~(1 << PB2); //set PB2 input for motion sensor
@@ -51,37 +53,37 @@ ISR(TIMER1_COMPA_vect) { // enable timer compare interrupt
 PORTD ^= (1 << PD6); // set pin 6 of Port D as XOR to blink, debug
 uint32_t door;
 uint32_t light;
-double temperature;
-uint32_t degree;
+//double temperature;
+//uint32_t degree;
 door = (uint32_t)ADCsingleREAD(1); //set ADC1
 light = (uint32_t)ADCsingleREAD(2);
-temperature = bmp085_gettemperature();
-degree = (uint32_t)temperature;//only integer part useful
+//temperature = bmp085_gettemperature();
+//degree = (uint32_t)temperature;//only integer part useful
 
 if(door>0){
-  data[1]=0x01;
+  data[1]='1';
   data[5]=(door>>24) & 0xFF;
   data[4]=(door>>16) & 0xFF;
   data[3]=(door>>8) & 0xFF;
   data[2]=door & 0xFF;
 }else if(light>0){
-  data[1]=0x02;
+  data[1]='2';
   data[5]=(light>>24) & 0xFF;
   data[4]=(light>>16) & 0xFF;
   data[3]=(light>>8) & 0xFF;
   data[2]=light & 0xFF;
-}else if(degree>0){
+/*}else if(degree>0){
   data[1]=0x03;
   data[5]=(degree>>24) & 0xFF;
   data[4]=(degree>>16) & 0xFF;
   data[3]=(degree>>8) & 0xFF;
-  data[2]=degree & 0xFF;
+  data[2]=degree & 0xFF;*/
 }else{
-  data[1]=0x04;
+  data[1]='4';
   if(PINB & (1<<PB2))
-    data[2]=0x01;
+    data[2]='1';
   else
-    data[2]=0x00;
+    data[2]='0';
 }
 
 usart_putstring(data);
