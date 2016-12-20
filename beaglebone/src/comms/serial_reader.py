@@ -60,11 +60,11 @@ class SerialReader:
         node = self.nodes[id - 1]
         info = message[1]
         if info == 0x01: # Handle door
-            handle_door(self, node, message[2:])
+            self.handle_door(self, node, message[2:])
         elif info == 0x02: # Handle light
-            handle_light(self, node, message[2:])
+            self.handle_light(self, node, message[2:])
         elif info == 0x03: # Handle temp
-            handle_temp(self, node, message[2:])
+            self.handle_temp(self, node, message[2:])
 
     def handle_door(self, node, data):
         node.data = data
