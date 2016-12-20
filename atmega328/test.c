@@ -86,7 +86,7 @@ if(door>0){
     data[2]='0';
 }
 
-usart_putstring(data);
+usart_putstring("data");
 }
 
 int write_to_master(char write) 
