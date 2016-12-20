@@ -2,7 +2,7 @@
 # Serial2 RX = pin 22 on P9 header
 import time
 
-beaglebone = False
+beaglebone = True
 if beaglebone:
     from bbio import *
 
@@ -13,9 +13,6 @@ class SerialReader:
         self.nodes = []
         self.data_buffer = ''
         self.status = 'Offline'
-
-        self.nodes.append(Node(1, 'Beta', 'Online'))
-        self.nodes.append(Node(2, 'Alpha', 'Online'))
 
     def setup(self):
         print "Setting up serial communications..."
@@ -39,36 +36,48 @@ class SerialReader:
 
     def parse_message(self):
         # Handle new node register
-        if message[0] == 0 and len(self.data_buffer) >= 5:
-            handle_new_node(self.data_buffer[:5])
-            self.data_buffer = data_buffer[5:]
-        elif len(self.data_buffer) >= 12:
-            handle_node_message(self.data_buffer[:12])
-            self.data_buffer = self.data_buffer[12:]
+        if self.data_buffer[0] == '0' and len(self.data_buffer) >= 6:
+            self.handle_new_node(self.data_buffer[:6])
+            self.data_buffer = self.data_buffer[6:]
+        elif len(self.data_buffer) >= 6:
+            id = 50000
+            try:
+                id = int(self.data_buffer[0])
+
+            except:
+                print "Something wrong with data"
+            if id <= len(self.nodes):
+                self.handle_node_message(self.data_buffer[:6])
+                self.data_buffer = self.data_buffer[6:]
+            else:
+                self.data_buffer = self.data_buffer[6:]
 
     def handle_new_node(self, message):
+        new_message = list(message)
         if len(self.nodes) == 0:
-            current_id = 1
+            current_id = 0
         else:
-            current_id = self.nodes[len(self.nodes) - 1].id
-        message[0] = chr(current_id + 1)
-        self.nodes.append(Node(current_id + 1, 'Node ' + message[0], 'Registering'))
-        Serial2.write(message)
+            current_id = len(self.nodes)
+        new_message[0] = chr(current_id + 49) 
+        self.nodes.append(Node(current_id + 1, 'Node ' + new_message[0], 'Registering'))
+        return_message = ''.join(new_message)
+        print "Returning " + return_message
+        Serial2.write(return_message)
 
     def handle_node_message(self, message):
         id = message[0]
         node = self.nodes[id - 1]
         info = message[1]
-        if info == 0x01: # Handle door
+        if info == '0': # Handle door
             self.handle_door(self, node, message[2:])
-        elif info == 0x02: # Handle light
+        elif info == '1': # Handle light
             self.handle_light(self, node, message[2:])
-        elif info == 0x03: # Handle temp
+        elif info == '2': # Handle temp
             self.handle_temp(self, node, message[2:])
 
     def handle_door(self, node, data):
         node.data = data
-
+        
     def handle_light(self, node, data):
         node.data = data
 
@@ -77,7 +86,7 @@ class SerialReader:
 
 
     def start(self):
-        if self.beaglebone:
+        if beaglebone:
             run(self.setup, self.loop)
 
 
@@ -89,3 +98,5 @@ class Node:
         self.type = 'NA'
         self.last_receive = time.time()
         self.data = 0
+        self.timer = none
+

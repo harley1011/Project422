@@ -29,7 +29,6 @@ def show_index(page):
 
 @simple_page.route('/assets/<path:path>')
 def serve_css(path):
-    print(path)
     try:
         return send_from_directory('templates/pages/assets/', path)
     except Exception:
@@ -46,7 +45,6 @@ def show_nodes():
 @simple_page.route('/<page>')
 def show(page):
     try:
-        comms.nodes.append(serial_reader.Node(comms.nodes[len(comms.nodes) - 1].id + 1,'Test', 'Online'))
         return render_template('pages/%s' % page, nodes=comms.nodes)
     except TemplateNotFound:
         abort(404)
