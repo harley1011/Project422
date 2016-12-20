@@ -57,8 +57,24 @@ class SerialReader:
 
     def handle_node_message(self, message):
         id = message[0]
+        node = self.nodes[id - 1]
         info = message[1]
+        if info == 0x01: # Handle door
+            handle_door(self, node, message[2:])
+        elif info == 0x02: # Handle light
+            handle_light(self, node, message[2:])
+        elif info == 0x03: # Handle temp
+            handle_temp(self, node, message[2:])
 
+    def handle_door(self, node, data):
+        node.data = data
+
+    def handle_light(self, node, data):
+        node.data = data
+
+    def handle_temp(self, node, data):
+        node.data = data
+	
     def start(self):
         if self.beaglebone:
             run(self.setup, self.loop)
@@ -71,4 +87,4 @@ class Node:
         self.status = status
         self.type = 'NA'
         self.last_receive = time.time()
-
+        self.data = 0

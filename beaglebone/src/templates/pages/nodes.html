@@ -14,6 +14,7 @@
                                     	<th>Name</th>
                                     	<th>Type</th>
                                         <th>Status</th>
+                                        <th>Data</th>
                                     </thead>
                                     <tbody>
                                     {% for node in nodes %}
@@ -22,6 +23,7 @@
                                         	<td>{{node.name}}</td>
                                         	<td>{{node.type}}</td>
                                             <td>{{node.status}}</td>
+                                            <td>{{node.data}}</td>
                                         </tr>
                                     {% endfor %}
                                     </tbody>
