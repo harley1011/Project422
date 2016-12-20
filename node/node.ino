@@ -3,7 +3,7 @@
 
 #define SENSOR_TYPE 0x01
 
-int motionSenorPin = 10;
+int motionSensorPin = 10;
 int lightPin = 0;
 
 // BMP Sensor Stuff
@@ -33,13 +33,12 @@ long pressure;
 // Use these for altitude conversions
 const float p0 = 101325;     // Pressure at sea level (Pa)
 float altitude;
-
+char data[6];
 
 
 void setup() {
   Serial.begin(4800);
-  pinMode(motionSenorPin, INPUT);
-  char data[6];
+  pinMode(motionSensorPin, INPUT);
   generateID(data);
 
   //pinMode(motionSenorPin, INPUT);
@@ -48,20 +47,30 @@ void setup() {
 }
 
 void loop() {
+  uint32_t val;
   //int val = readPhoto();
   if (SENSOR_TYPE == 0x01)
   {
-    // motion
+    val = digitalRead(motionSensorPin);
   }
   else if (SENSOR_TYPE == 0x02) 
   {
-    int val = readPhoto;
+    val = readPhoto();
+    data[1]=0x02;
   }
   else if (SENSOR_TYPE == 0x03)
   {
-      readTemp();
+     val = (uint32_t)readTemp();
+     data[1]=0x03;
   }
-  //Serial.println(val);
+  data[5]=(val>>24) & 0xFF;
+  data[4]=(val>>16) & 0xFF;
+  data[3]=(val>>8) & 0xFF;
+  data[2]=val & 0xFF;
+  for(int i=0; i<6; i++){
+    Serial.print(data[i]);
+  }
+  Serial.print("\n");
   delay(2000);
 }
 
@@ -71,16 +80,16 @@ void generateID(char* data){
 
   idRequest[0]='0';
   idRequest[1]='0';
-  idRequest[2]='a';
+  /*idRequest[2]='a';
   idRequest[3]='b';
   idRequest[4]='c';
-  idRequest[5]='d';
+  idRequest[5]='d';*/
 
-  /*uint32_t temp = random(1000000000);
+  uint32_t temp = random(1000000000);
   idRequest[5]=(temp>>24) & 0xFF;
   idRequest[4]=(temp>>16) & 0xFF;
   idRequest[3]=(temp>>8) & 0xFF;
-  idRequest[2]=temp & 0xFF;*/
+  idRequest[2]=temp & 0xFF;
 
   Serial.println(idRequest);
 
@@ -95,14 +104,14 @@ void generateID(char* data){
     if(idReceive[2]==idRequest[2]&&idReceive[3]==idRequest[3]
       &&idReceive[4]==idRequest[4]&&idReceive[5]==idRequest[5]){
       data[0]=idReceive[0];
-      for(int i=0;i<6;i++)
-        Serial.print(data[i]);
+      /*for(int i=0;i<6;i++)
+        Serial.print(data[i]);*/
       break;
      }
   }
 }
 
-void readTemp() {
+short readTemp() {
   temperature = bmp085GetTemperature(bmp085ReadUT());
   pressure = bmp085GetPressure(bmp085ReadUP());
   altitude = (float)44330 * (1 - pow(((float) pressure/p0), 0.190295));
@@ -116,6 +125,7 @@ void readTemp() {
   Serial.print(altitude, 2);
   Serial.println(" m");
   Serial.println();
+  return temperature;
   
 }
 
