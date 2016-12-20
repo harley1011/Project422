@@ -92,16 +92,16 @@ void generateID(char* data){
         temp = Serial.read();
       idReceive[i] = temp;
     }
-    /*if(idReceive[2]==idRequest[2]&&idReceive[3]==idRequest[3]
+    if(idReceive[2]==idRequest[2]&&idReceive[3]==idRequest[3]
       &&idReceive[4]==idRequest[4]&&idReceive[5]==idRequest[5]){
       data[0]=idReceive[0];
-      Serial.println(idReceive);
-      Serial.println(data);
-      break;*/
       for(int i=0;i<6;i++)
-        Serial.print(idReceive[i]);
+        Serial.print(data[i]);
+      break;
+     }
   }
 }
+
 void readTemp() {
   temperature = bmp085GetTemperature(bmp085ReadUT());
   pressure = bmp085GetPressure(bmp085ReadUP());
@@ -118,11 +118,10 @@ void readTemp() {
   Serial.println();
   
 }
+
 int readPhoto() {
   return analogRead(lightPin);
 }
-
-
 
 void bmp085Calibration()
 {
