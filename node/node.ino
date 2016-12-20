@@ -51,6 +51,7 @@ void loop() {
   //int val = readPhoto();
   if (SENSOR_TYPE == 0x01)
   {
+    data[1] = 0x01;
     val = digitalRead(motionSensorPin);
   }
   else if (SENSOR_TYPE == 0x02) 
@@ -100,16 +101,18 @@ void generateID(char* data){
     {
       int temp = - 1;
       int counter =0;
-      while (temp == -1)
+      while (temp == -1){
         counter++;
         temp = Serial.read();
-      idReceive[i] = temp;
-      if(counter==100){
+      
+      if(counter==90000){
         counter=0;
         for(int i=0; i<6; i++)
           Serial.print(idRequest[i]);
         Serial.print("\n");
       }
+    }
+    idReceive[i] = temp;
     }
     if(idReceive[2]==idRequest[2]&&idReceive[3]==idRequest[3]
       &&idReceive[4]==idRequest[4]&&idReceive[5]==idRequest[5]){
