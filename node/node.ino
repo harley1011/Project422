@@ -91,15 +91,25 @@ void generateID(char* data){
   idRequest[3]=(temp>>8) & 0xFF;
   idRequest[2]=temp & 0xFF;
 
-  Serial.println(idRequest);
+  for(int i=0; i<6; i++)
+    Serial.print(idRequest[i]);
+  Serial.print("\n");
 
   while(1){
     for(int i=0; i<6; i++)
     {
       int temp = - 1;
+      int counter =0;
       while (temp == -1)
+        counter++;
         temp = Serial.read();
       idReceive[i] = temp;
+      if(counter==100){
+        counter=0;
+        for(int i=0; i<6; i++)
+          Serial.print(idRequest[i]);
+        Serial.print("\n");
+      }
     }
     if(idReceive[2]==idRequest[2]&&idReceive[3]==idRequest[3]
       &&idReceive[4]==idRequest[4]&&idReceive[5]==idRequest[5]){
