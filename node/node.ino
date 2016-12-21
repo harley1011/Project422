@@ -38,13 +38,22 @@ float altitude;
 
 void setup() {
   Serial.begin(4800);
-  pinMode(motionSenorPin, INPUT);
   char data[6];
   generateID(data);
 
-  //pinMode(motionSenorPin, INPUT);
-  //Wire.begin();
-  //bmp085Calibration();
+  if (SENSOR_TYPE == 0x01)
+  {
+    pinMode(motionSenorPin, INPUT);
+  }
+  else if (SENSOR_TYPE == 0x02) 
+  {
+    pinMode(motionSenorPin, INPUT);
+  }
+  else if (SENSOR_TYPE == 0x03)
+  {
+    Wire.begin();
+    bmp085Calibration();
+  }
 }
 
 void loop() {
