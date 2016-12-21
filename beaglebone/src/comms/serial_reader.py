@@ -80,7 +80,7 @@ class SerialReader:
 
     def check_timeouts(self):
         for node in self.nodes:
-            if time.time() - node.timeout_timer > 20:
+            if node.timeout_timer != None and time.time() - node.timeout_timer > 20:
                 node.status = "Offline"
 
     def handle_door(self, node, data):
